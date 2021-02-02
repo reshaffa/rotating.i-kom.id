@@ -1,10 +1,11 @@
-import { GET_VIBRATIONS, POST_VIBRATIONS } from '../actions/vibrationActions';
+import { GET_VIBRATIONS, POST_VIBRATIONS, REMOVE_VIBRATIONS } from '../actions/vibrationActions';
 
 let initialState = {
     vibrations : [],
+    get_status : false,
     error : false,
-    crated_vibrations : false,
-    error_vibrations : false
+    created_status : false,
+    deleted_status : false
 }
 
 const vibrations = (state = initialState, action) => {
@@ -13,14 +14,22 @@ const vibrations = (state = initialState, action) => {
             return {
                 ...state,
                 vibrations : action.payload.data,
+                get_status : action.payload.status,
                 error : action.payload.errorMessage
             }
             break;
         case POST_VIBRATIONS:
             return {
                 ...state,
-                crated_vibrations : action.payload.data,
+                created_vibrations : action.payload.data,
+                created_status : action.payload.created_status,
                 error_vibrations : action.payload.errorMessage
+            }
+            break;
+        case REMOVE_VIBRATIONS:
+            return {
+                ...state,
+                deleted_status : action.payload.deleted_status
             }
             break;
         default:

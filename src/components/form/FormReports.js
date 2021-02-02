@@ -1,12 +1,25 @@
 import React, { Component } from 'react'
-import { reduxForm, Field } from 'redux-form'
+import { reduxForm, Field, FieldArray } from 'redux-form'
 import { connect } from 'react-redux'
 import { Col, FormLabel, Row, FormGroup, Button } from 'react-bootstrap'
 import _ from 'lodash'
 import moment from 'moment'
 import * as XLSX from 'xlsx'
 
+let excel = []
 class FormReports extends Component {
+    
+    getYears (){
+        const years = []
+        const dateStart = moment()
+        const dateEnd = moment().subtract(10, 'y')
+        while (dateStart.diff(dateEnd, 'years') >= 0) {
+          years.push(<option key={dateStart.format('YYYY')} value={dateStart.format('YYYY')}>{dateStart.format('YYYY')}</option>)
+          dateStart.subtract(1,'y')
+        }
+        return years
+    }
+
     readExcel(file){
         const promise = new Promise((resolve, reject) => {
             const fileReader = new FileReader();
@@ -18,7 +31,7 @@ class FormReports extends Component {
                 const wbookName = wbook.SheetNames[0];
                 const wsheet = wbook.Sheets[wbookName];
     
-                const data = XLSX.utils.sheet_to_json(wsheet,  {raw: false});
+                const data = XLSX.utils.sheet_to_json(wsheet,  { raw: false });
                 resolve(data);
             }
     
@@ -33,25 +46,22 @@ class FormReports extends Component {
             //console.log(d)
             let temp = []
             d.map((el) => {
-    
-                let compare_date =  (_.isEmpty(el.__EMPTY_6) ? null : el.__EMPTY_6.split('/'))
-                let day = (_.isEmpty(el.__EMPTY_6) ? null : parseInt(compare_date[1]));
-                let month = (_.isEmpty(el.__EMPTY_6) ? null : parseInt(compare_date[0]));
-                let year = (_.isEmpty(el.__EMPTY_6) ? null : parseInt(compare_date[2]));
-                let is_compared = (_.isEmpty(el.__EMPTY_6) ? null : day.toString()+"-"+month.toString()+"-"+year.toString());
-                let last_date = (_.isEmpty(el.__EMPTY_6) ? null : moment(is_compared.toString()).format('YYYY-MM-DD'));
-                
+              
+                let vib_max = (_.isEmpty(el.__EMPTY_31) || el.__EMPTY_31.trim() == "" ? 0 : el.__EMPTY_31.toString().replace(" (g)",""))
+                let acc_max = (_.isEmpty(el.__EMPTY_32) || el.__EMPTY_32.trim() == "" ? 0 : el.__EMPTY_32.toString().replace(" (g)",""))
+                let max_level = (_.isEmpty(el.__EMPTY_33) || el.__EMPTY_33.trim() == "" ? 0 : el.__EMPTY_33.toString().replace(" (g)",""))
+
                 let actual_vib = (
-                    el.__EMPTY_38 == "A" && el.__EMPTY_39 == "D" ? parseFloat(el.__EMPTY_31) : 
-                    el.__EMPTY_38 == "N" && el.__EMPTY_39 == "A" || el.__EMPTY_39 == "D", el.__EMPTY_39 ? parseFloat(el.__EMPTY_32) :
-                    el.__EMPTY_38 == "N" && el.__EMPTY_39 == "N" ? parseFloat(el.__EMPTY_33) : 0
+                    el.__EMPTY_38 == "A" && el.__EMPTY_39 == "D" ? parseFloat(vib_max) : 
+                    el.__EMPTY_38 == "N" && el.__EMPTY_39 == "A" || el.__EMPTY_39 == "D", el.__EMPTY_39 ? parseFloat(acc_max) :
+                    el.__EMPTY_38 == "N" && el.__EMPTY_39 == "N" ? parseFloat(max_level) : 0
                 )
     
                 temp.push({
                     tag_no : el.__EMPTY_2,
                     user_id : 1,
                     area_name : el.__EMPTY_5,
-                    last_date : last_date,
+                    last_date : (_.isEmpty(el.__EMPTY_6) ? null : el.__EMPTY_6.toString()),
                     dvr_ob : (_.isEmpty(el.__EMPTY_13) ? 0 : parseFloat(el.__EMPTY_13)),
                     dvr_obv : (_.isEmpty(el.__EMPTY_14) ? 0 : parseFloat(el.__EMPTY_14)),
                     dvr_obh : (_.isEmpty(el.__EMPTY_15) ? 0 : parseFloat(el.__EMPTY_15)),
@@ -66,29 +76,34 @@ class FormReports extends Component {
                     dvn_ibv : (_.isEmpty(el.__EMPTY_24) ? 0 : parseFloat(el.__EMPTY_24)),
                     dvn_ibh : (_.isEmpty(el.__EMPTY_25) ? 0 : parseFloat(el.__EMPTY_25)),
                     dvn_a : (_.isEmpty(el.__EMPTY_26) ? 0 : parseFloat(el.__EMPTY_26)),
-                    dvr_max : (_.isEmpty(el.__EMPTY_27) ? 0 : parseFloat(el.__EMPTY_27)),
-                    dvn_max : (_.isEmpty(el.__EMPTY_28) ? 0 : parseFloat(el.__EMPTY_28)),
-                    max_level : (_.isEmpty(el.__EMPTY_33) ? 0 : parseFloat(el.__EMPTY_33)),
-                    actual_vib : actual_vib,
-                    position : (_.isEmpty(el.__EMPTY_37) ? "-" : el.__EMPTY_37),
-                    vib_status : (_.isEmpty(el.__EMPTY_38) ? "-" : el.__EMPTY_38),
-                    acc_status : (_.isEmpty(el.__EMPTY_39) ? "-" : el.__EMPTY_39),
-                    status : (_.isEmpty(el.__EMPTY_40) ? "-" : el.__EMPTY_40),
-                    indikasi : (_.isEmpty(el.__EMPTY_41) ? "-" : el.__EMPTY_41),
-                    type : el.__EMPTY_68,
-                    remark : (_.isEmpty(el.__EMPTY_69) ? "-" : el.__EMPTY_69),
-                    saran : (_.isEmpty(el.__EMPTY_70) ? "-" : el.__EMPTY_70)
+                    dvr_max : (_.isEmpty(vib_max) ? 0 : parseFloat(vib_max)),
+                    dvn_max : (_.isEmpty(acc_max) ? 0 : parseFloat(acc_max)),
+                    max_level : (_.isEmpty(max_level) ? 0 : parseFloat(max_level)),
+                    actual_vib : parseFloat(actual_vib),
+                    position : (_.isEmpty(el.__EMPTY_37) || el.__EMPTY_37.trim() =="" ? "-" : el.__EMPTY_37),
+                    vib_status : (_.isEmpty(el.__EMPTY_38) || el.__EMPTY_38.trim() =="" ? "-" : el.__EMPTY_38),
+                    acc_status : (_.isEmpty(el.__EMPTY_39) || el.__EMPTY_39.trim() =="" ? "-" : el.__EMPTY_39),
+                    status : (_.isEmpty(el.__EMPTY_40) || el.__EMPTY_40.trim() =="" ? "-" : el.__EMPTY_40),
+                    indikasi : (_.isEmpty(el.__EMPTY_67) || el.__EMPTY_67.trim() =="" ? "-" : el.__EMPTY_67),
+                    type : (_.isEmpty(el.__EMPTY_68) || el.__EMPTY_68.trim() == "" ? "-" : el.__EMPTY_68),
+                    remark : (_.isEmpty(el.__EMPTY_69) || el.__EMPTY_69.trim() =="" ? "-" : el.__EMPTY_69),
+                    saran : (_.isEmpty(el.__EMPTY_70) || el.__EMPTY_70.trim() =="" ? "-" : el.__EMPTY_70)
                 })
             })
             temp.splice(0,5)
+            excel.push({
+                filename : file.name,
+                items : temp
+            })
             console.log(temp)
         })
     }
+
     render() {
         return (
             <form className="form-horizontal" onSubmit={this.props.handleSubmit}>
-                    <Row>
-                        <Col md={6}>
+                    <Row className="mt-2">
+                        <Col md={5}>
                             <FormGroup>
                                 <FormLabel htmlFor="month" className="control-label">
                                 Upload File Excel <span className="text-danger">*</span>
@@ -106,6 +121,22 @@ class FormReports extends Component {
                                 />
                             </FormGroup>
                         </Col>
+                        <Col md={2}>
+                            <FormGroup>
+                                <FormLabel htmlFor="year" className="control-label">
+                                    Tahun <span className="text-danger">*</span>
+                                </FormLabel>
+                                <Field
+                                    component="select"
+                                    name="year"
+                                    className="form-control"
+                                    required={true}
+                                >
+                                    <option value="">-- Pilih Tahun --</option>
+                                    { this.getYears() }
+                                </Field>
+                            </FormGroup>
+                        </Col>
                         <Col md={3}>
                             <FormGroup>
                                 <FormLabel htmlFor="month" className="control-label">
@@ -115,6 +146,7 @@ class FormReports extends Component {
                                     component="select"
                                     name="month"
                                     className="form-control"
+                                    required={true}
                                 >
                                     <option value="">-- Pilih Bulan --</option>
                                     <option value="1"> Januari</option>
@@ -132,15 +164,16 @@ class FormReports extends Component {
                                 </Field>
                             </FormGroup>
                         </Col>
-                        <Col md={3}>
+                        <Col md={2}>
                             <FormGroup>
-                                <FormLabel htmlFor="month" className="control-label">
+                                <FormLabel htmlFor="week" className="control-label">
                                     Week <span className="text-danger">*</span>
                                 </FormLabel>
                                 <Field
                                     component="select"
                                     name="week"
                                     className="form-control"
+                                    required={true}
                                 >
                                     <option value="">-- Pilih Week --</option>
                                     <option value="1"> W 1</option>
@@ -152,17 +185,17 @@ class FormReports extends Component {
                             </FormGroup>
                         </Col>
                     </Row>
-                <Row>
-                    <Col>
-                        <Button 
-                            type="submit"
-                            disabled={this.props.submitting}
-                            className="btn btn-xs btn-success ml-0 mr-0"
-                        >
-                        <i className="fas fa-plus-circle"></i>&nbsp; Submit
-                        </Button>
-                    </Col>
-                </Row>
+                    <Row>
+                        <Col>
+                            <Button 
+                                type="submit"
+                                disabled={ this.props.pristine || this.props.submitting}
+                                className="btn btn-xs btn-success ml-0 mr-0"
+                            >
+                                <div><i className="fas fa-plus-circle"></i>&nbsp; Submit</div>
+                            </Button>
+                        </Col>
+                    </Row>
             </form>
         )
     }
@@ -170,6 +203,9 @@ class FormReports extends Component {
 
 FormReports = reduxForm({
     form : 'FormReports',
+    initialValues : {
+        file : excel
+    },
     //validate : areaValidate, 
     enableReinitialize : true
 })(FormReports)

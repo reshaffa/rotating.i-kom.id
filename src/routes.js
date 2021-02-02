@@ -6,18 +6,19 @@ import { DefaultLayout } from "./layouts";
 
 // Route Views
 import Dashboard from "./views/Dashboard";
-import Users from "./views/Users";
+//import Users from "./views/Users";
 import Reports from "./views/Reports";
-import Locations from "./views/Locations";
-import Login from "./views/Login"
+//import Locations from "./views/Locations";
+//import Login from "./views/Login"
 
 export default [
   {
     path: "/",
     exact: true,
     layout: DefaultLayout,
-    component: () => <Redirect to="/dashboard" />
+    component: () => <Redirect to="/reports" />
   },
+  /*
   {
     path: "/login",
     layout: false,
@@ -28,11 +29,13 @@ export default [
     layout: DefaultLayout,
     component: Dashboard
   },
+  */
   {
     path: "/reports",
     layout: DefaultLayout,
     component: Reports
   },
+  /*
   {
     path: "/users",
     layout: DefaultLayout,
@@ -43,4 +46,5 @@ export default [
     layout: DefaultLayout,
     component: Locations
   }
+  */
 ];

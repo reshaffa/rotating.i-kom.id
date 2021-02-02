@@ -1,7 +1,8 @@
 import React, { useState} from 'react';
-import BootstrapTable from 'react-bootstrap-table-next';
-import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
 import { Col, Row, Button } from 'shards-react';
+import ToolkitProvider, { Search } from 'react-bootstrap-table2-toolkit';
+import paginationFactory from 'react-bootstrap-table2-paginator';
+import BootstrapTable from 'react-bootstrap-table-next';
 import FormAreas from '../form/FormAreas';
 import { connect } from 'react-redux';
 import { Modal } from 'react-bootstrap';
@@ -125,7 +126,6 @@ const TableAreas = (props) => {
                         </Row>
                       <BootstrapTable bootstrap4 classes="table-sm"
                         { ...props.baseProps }
-                        hover striped condensed
                       />
                     </div>
                   )

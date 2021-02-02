@@ -1,4 +1,0 @@
-{
-    "appService.defaultWebAppToDeploy": "/subscriptions/721e82f2-25b8-46e9-a3e9-24807ab642b4/resourceGroups/appsvc_linux_centralus/providers/Microsoft.Web/sites/rotating",
-    "appService.deploySubpath": "."
-}

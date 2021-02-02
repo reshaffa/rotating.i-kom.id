@@ -42,24 +42,12 @@ MainFooter.defaultProps = {
   copyright: "Copyright © 2020 Desainku.site",
   menuItems: [
     {
-      title: "Home",
-      to: "#"
+      title: "Dashboard",
+      to: "/dashboard"
     },
     {
-      title: "Services",
-      to: "#"
-    },
-    {
-      title: "About",
-      to: "#"
-    },
-    {
-      title: "Products",
-      to: "#"
-    },
-    {
-      title: "Blog",
-      to: "#"
+      title: "Reports",
+      to: "/reports"
     }
   ]
 };

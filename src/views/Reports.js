@@ -8,15 +8,15 @@ import FormReports from '../components/form/FormReports'
 import { getVibrations, postVibrations } from '../actions/vibrationActions';
 
 class Reports extends Component{
-
   componentDidMount(){
     this.props.dispatch(getVibrations())
   }
 
-
   handleSubmit(data){
-    console.log(data)
-    //this.props.dispatch(postVibrations(data))
+    //console.log(data)
+    //console.log(data.file[0].filename)
+    //console.log(data.file[0].items)
+    this.props.dispatch(postVibrations(data))
   }
 
   render(){
